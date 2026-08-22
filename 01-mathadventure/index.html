@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>MathVenture</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#111;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;}
+#game-container{width:800px;}
+.speed-container{width:100%;background:#222;border-radius:6px;margin-bottom:8px;padding:8px 12px;display:flex;align-items:center;gap:12px;border:1px solid #444;}
+.speed-label{font-size:14px;font-weight:bold;white-space:nowrap;}
+.speed-bar-bg{flex-grow:1;height:16px;background:#111;border-radius:10px;overflow:hidden;border:1px solid #333;}
+.speed-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#00adb5,#ff4757);transition:width 0.1s linear;}
+.canvas-wrapper{position:relative;width:800px;height:400px;}
+canvas{background:#222;border:2px solid #555;border-radius:8px;display:block;}
+.ui-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);border-radius:8px;text-align:center;padding:20px;}
+button{padding:10px 20px;font-size:16px;font-weight:bold;cursor:pointer;border:none;border-radius:5px;background:#00adb5;color:#fff;margin:10px;transition:0.2s;}
+button:hover{background:#393e46;}
+input[type="number"]{padding:10px;font-size:18px;border-radius:5px;border:none;text-align:center;width:140px;margin:10px;}
+.hidden{display:none !important;}
+.char-select{display:flex;gap:15px;margin:15px 0;}
+.char-btn{font-size:24px;padding:10px 20px;background:#333;border:2px solid transparent;}
+.char-btn.selected{border-color:#00adb5;background:#444;}
+h1{margin-bottom:10px;}
+p{margin-bottom:10px;}
+#math-feedback{font-weight:bold;margin-top:5px;min-height:24px;}
+</style>
+</head>
+<body>
+<div id="game-container">
+<div class="speed-container">
+<span class="speed-label">⚡ VELOCIDAD:</span>
+<div class="speed-bar-bg"><div id="speed-fill" class="speed-bar-fill"></div></div>
+<span id="speed-text" class="speed-label">Lento</span>
+</div>
+<div class="canvas-wrapper">
+<canvas id="gameCanvas" width="800" height="400"></canvas>
+<div id="start-screen" class="ui-overlay">
+<h1>MathVenture</h1>
+<p>Selecciona tu personaje:</p>
+<div class="char-select">
+<button class="char-btn selected" id="btn-cat">🐱 Gato</button>
+<button class="char-btn" id="btn-dog">🐶 Perro</button>
+</div>
+<p>Usa la barra Espaciadora para saltar.</p>
+<button id="start-btn">Iniciar Juego</button>
+</div>
+<div id="math-screen" class="ui-overlay hidden">
+<h2>¡Obstáculo detectado!</h2>
+<p>Resuelve el problema para continuar:</p>
+<h1 id="math-question" style="font-size:36px;color:#00adb5;"></h1>
+<form id="math-form" onsubmit="return false;">
+<input type="number" id="math-answer" required autocomplete="off">
+<br>
+<button type="submit" id="math-submit">Responder</button>
+</form>
+<div id="math-feedback"></div>
+</div>
+<div id="win-screen" class="ui-overlay hidden">
+<h1 id="win-title">¡Bien hecho!</h1>
+<p id="win-msg"></p>
+<button id="next-btn">Siguiente Nivel</button>
+</div>
+</div>
+</div>
+<script>
+const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
+const startScreen=document.getElementById('start-screen');
+const mathScreen=document.getElementById('math-screen');
+const winScreen=document.getElementById('win-screen');
+const winTitle=document.getElementById('win-title');
+const winMsg=document.getElementById('win-msg');
+const startBtn=document.getElementById('start-btn');
+const nextBtn=document.getElementById('next-btn');
+const btnCat=document.getElementById('btn-cat');
+const btnDog=document.getElementById('btn-dog');
+const mathQuestionEl=document.getElementById('math-question');
+const mathAnswerEl=document.getElementById('math-answer');
+const mathForm=document.getElementById('math-form');
+const mathFeedback=document.getElementById('math-feedback');
+const speedFill=document.getElementById('speed-fill');
+const speedText=document.getElementById('speed-text');
+let selectedChar='🐱';
+let level=1;
+let attempts=0;
+let questionsAnswered=0;
+let currentCorrectAnswer=0;
+let isPlaying=false;
+let animationId;
+let score=0;
+let currentSpeed=4;
+const minSpeed=4;
+const maxSpeed=16;
+const levelConfigs=[
+{baseSpeed:4,spawnRate:90},
+{baseSpeed:7,spawnRate:75},
+{baseSpeed:10,spawnRate:60}
+];
+let player={x:80,y:320,w:35,h:35,vy:0,gravity:0.7,jumpPower:-12,isGrounded:true};
+let obstacles=[];
+let frameCount=0;
+btnCat.onclick=()=>{selectedChar='🐱';btnCat.classList.add('selected');btnDog.classList.remove('selected');};
+btnDog.onclick=()=>{selectedChar='🐶';btnDog.classList.add('selected');btnCat.classList.remove('selected');};
+startBtn.onclick=()=>{
+startScreen.classList.add('hidden');
+level=1;
+attempts=0;
+resetLevelData();
+isPlaying=true;
+gameLoop();
+};
+nextBtn.onclick=()=>{
+winScreen.classList.add('hidden');
+if(level<3){
+level++;
+resetLevelData();
+isPlaying=true;
+gameLoop();
+}else{
+level=1;
+attempts=0;
+startScreen.classList.remove('hidden');
+}
+};
+window.addEventListener('keydown',(e)=>{
+if(e.code==='Space'){
+e.preventDefault();
+if(isPlaying && player.isGrounded){
+player.vy=player.jumpPower;
+player.isGrounded=false;
+}
+}
+});
+function resetLevelData(){
+player.y=320;
+player.vy=0;
+player.isGrounded=true;
+obstacles=[];
+frameCount=0;
+score=0;
+questionsAnswered=0;
+updateSpeedBar();
+}
+function updateSpeedBar(){
+const cfg=levelConfigs[level-1];
+currentSpeed=cfg.baseSpeed+(score*0.002);
+let pct=((currentSpeed-minSpeed)/(maxSpeed-minSpeed))*100;
+pct=Math.min(100,Math.max(0,pct));
+speedFill.style.width=pct+'%';
+if(pct<35)speedText.innerText='Lento';
+else if(pct<70)speedText.innerText='Medio';
+else speedText.innerText='¡Muy Rápido!';
+}
+function generateMathProblem(lvl){
+let a,b,question,answer;
+if(lvl===1){
+a=Math.floor(Math.random()*10)+1;
+b=Math.floor(Math.random()*10)+1;
+if(Math.random()>0.5){
+question=`${a} + ${b} = ?`;
+answer=a+b;
+}else{
+if(a<b){let t=a;a=b;b=t;}
+question=`${a} - ${b} = ?`;
+answer=a-b;
+}
+}else if(lvl===2){
+a=Math.floor(Math.random()*10)+2;
+b=Math.floor(Math.random()*10)+2;
+question=`${a} × ${b} = ?`;
+answer=a*b;
+}else{
+a=Math.floor(Math.random()*9)+2;
+let x=Math.floor(Math.random()*12)+1;
+b=a*x;
+question=`Si ${a} × X = ${b}, ¿cuánto vale X?`;
+answer=x;
+}
+return {question,answer};
+}
+function triggerMathModal(){
+isPlaying=false;
+cancelAnimationFrame(animationId);
+const prob=generateMathProblem(level);
+mathQuestionEl.innerText=prob.question;
+currentCorrectAnswer=prob.answer;
+mathAnswerEl.value='';
+mathFeedback.innerText='';
+mathScreen.classList.remove('hidden');
+setTimeout(()=>mathAnswerEl.focus(),100);
+}
+mathForm.onsubmit=(e)=>{
+e.preventDefault();
+const userAns=parseInt(mathAnswerEl.value,10);
+attempts++;
+if(userAns===currentCorrectAnswer){
+questionsAnswered++;
+mathScreen.classList.add('hidden');
+obstacles=[];
+if(questionsAnswered>=5){
+if(level===3){
+winTitle.innerText='¡Felicidades!';
+winMsg.innerText=`¡Completaste MathVenture! Superaste los 3 niveles en un total de ${attempts} intentos resueltos.`;
+nextBtn.innerText='Volver al Inicio';
+}else{
+winTitle.innerText='¡Bien hecho!';
+winMsg.innerText=`Completaste el Nivel ${level} tras responder 5 preguntas (Intentos acumulados: ${attempts}).`;
+nextBtn.innerText='Siguiente Nivel';
+}
+winScreen.classList.remove('hidden');
+}else{
+isPlaying=true;
+gameLoop();
+}
+}else{
+mathFeedback.style.color='#ff4757';
+mathFeedback.innerText='Incorrecto. Inténtalo de nuevo.';
+mathAnswerEl.value='';
+}
+};
+function gameLoop(){
+if(!isPlaying)return;
+update();
+draw();
+animationId=requestAnimationFrame(gameLoop);
+}
+function update(){
+const cfg=levelConfigs[level-1];
+frameCount++;
+score++;
+updateSpeedBar();
+player.vy+=player.gravity;
+player.y+=player.vy;
+if(player.y>=320){
+player.y=320;
+player.vy=0;
+player.isGrounded=true;
+}
+if(frameCount%cfg.spawnRate===0){
+const h=20+Math.random()*30;
+obstacles.push({x:canvas.width,y:355-h,w:20,h:h});
+}
+for(let i=obstacles.length-1;i>=0;i--){
+obstacles[i].x-=currentSpeed;
+if(checkCollision(player,obstacles[i])){
+triggerMathModal();
+return;
+}
+if(obstacles[i].x+obstacles[i].w<0){
+obstacles.splice(i,1);
+}
+}
+}
+function checkCollision(p,o){
+return p.x<o.x+o.w && p.x+p.w>o.x && p.y<o.y+o.h && p.y+p.h>o.y;
+}
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle='#444';
+ctx.fillRect(0,355,canvas.width,45);
+ctx.font='30px sans-serif';
+ctx.fillText(selectedChar,player.x,player.y+28);
+ctx.fillStyle='#ff4757';
+for(let o of obstacles){
+ctx.fillRect(o.x,o.y,o.w,o.h);
+}
+ctx.fillStyle='#fff';
+ctx.font='16px sans-serif';
+ctx.fillText(`Nivel: ${level}/3`,15,25);
+ctx.fillText(`Preguntas resueltas: ${questionsAnswered}/5`,15,50);
+ctx.fillText(`Intentos totales: ${attempts}`,15,75);
+}
+</script>
+</body>
+</html>

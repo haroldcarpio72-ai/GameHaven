@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GameHaven — Portafolio de Videojuegos de Harold Carpio</title>
+<meta name="description" content="Portafolio de prototipos de videojuegos desarrollados por Harold Abdel Carpio Santander."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0a12;
+    --bg-alt: #12111c;
+    --surface: #17162356;
+    --line: #2a2838;
+    --text: #f1f0f7;
+    --text-dim: #a6a3bd;
+    --cyan: #00f5d4;
+    --pink: #ff206e;
+    --gold: #ffd23f;
+    --radius: 16px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* textura de scanlines sutil de fondo */
+  body::before{
+    content:"";
+    position: fixed; inset:0;
+    pointer-events:none;
+    background-image: repeating-linear-gradient(
+      0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px,
+      transparent 1px, transparent 3px
+    );
+    z-index: 1;
+  }
+
+  .wrap{ max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+
+  a{ color: inherit; text-decoration:none; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding: 90px 0 70px;
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(255,32,110,0.25), transparent 55%),
+      radial-gradient(ellipse at 85% 0%, rgba(0,245,212,0.18), transparent 50%),
+      linear-gradient(180deg, #0f0c29 0%, #0a0a12 100%);
+    border-bottom: 1px solid var(--line);
+    overflow:hidden;
+  }
+
+  .hero-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .18em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    display:flex; align-items:center; gap:10px;
+    margin-bottom: 26px;
+  }
+  .hero-eyebrow::before{
+    content:""; width:8px; height:8px; background:var(--pink); border-radius:50%;
+    box-shadow: 0 0 12px var(--pink);
+    animation: blink 1.6s infinite steps(2);
+  }
+  @keyframes blink{ 50%{ opacity:.25; } }
+
+  .hero h1{
+    font-family: 'Press Start 2P', system-ui, sans-serif;
+    font-size: clamp(30px, 6vw, 58px);
+    line-height: 1.25;
+    letter-spacing: -1px;
+    background: linear-gradient(92deg, #ffffff 30%, var(--cyan) 65%, var(--pink) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 22px;
+  }
+
+  .hero p.lead{
+    max-width: 620px;
+    font-size: 18px;
+    color: var(--text-dim);
+    margin-bottom: 34px;
+  }
+
+  .hero-stats{ display:flex; gap: 34px; flex-wrap: wrap; }
+  .stat{ font-family:'JetBrains Mono', monospace; }
+  .stat b{ display:block; font-size: 26px; color: var(--text); }
+  .stat span{ font-size: 12px; color: var(--text-dim); text-transform:uppercase; letter-spacing:.08em; }
+
+  /* ---------- ABOUT ---------- */
+  .about{ padding: 64px 0; border-bottom: 1px solid var(--line); }
+  .about-grid{
+    display:grid; grid-template-columns: 200px 1fr; gap: 44px; align-items:start;
+  }
+  .about-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px; letter-spacing:.14em; text-transform:uppercase;
+    color: var(--pink);
+  }
+  .about h2{ font-size: 26px; margin-bottom: 14px; }
+  .about p{ color: var(--text-dim); max-width: 640px; margin-bottom: 10px; }
+  .about strong{ color: var(--text); }
+  .badges{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 20px; }
+  .badge{
+    font-family:'JetBrains Mono', monospace; font-size: 11px;
+    padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--text-dim);
+  }
+
+  /* ---------- GAMES ---------- */
+  .games{ padding: 70px 0 100px; }
+  .games h2{
+    font-family: 'Press Start 2P', system-ui, sans-serif;
+    font-size: 20px; margin-bottom: 8px;
+  }
+  .games .sub{ color: var(--text-dim); margin-bottom: 44px; }
+
+  .grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 26px;
+  }
+
+  .card{
+    position: relative;
+    background: linear-gradient(180deg, #14131f 0%, #0e0d17 100%);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display:flex; flex-direction:column;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  }
+  .card:hover{
+    transform: translateY(-6px);
+    border-color: var(--accent);
+    box-shadow: 0 18px 40px -14px var(--accent-glow);
+  }
+  .card-media{
+    aspect-ratio: 16/8;
+    overflow:hidden;
+    border-bottom: 1px solid var(--line);
+    background: #0a0a12;
+  }
+  .card-media img{ width:100%; height:100%; object-fit: cover; display:block; }
+
+  .card-body{ padding: 22px 22px 24px; display:flex; flex-direction:column; gap:12px; flex:1; }
+
+  .card-top{ display:flex; align-items:center; justify-content:space-between; gap: 10px; }
+  .card-title{ font-size: 19px; font-weight: 700; }
+  .num{ font-family:'JetBrains Mono', monospace; font-size:12px; color: var(--accent); }
+
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{
+    font-family:'JetBrains Mono', monospace; font-size: 10.5px;
+    padding: 4px 10px; border-radius: 6px;
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+
+  .card-desc{ color: var(--text-dim); font-size: 14.5px; flex:1; }
+
+  .card-controls{
+    font-family:'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-dim);
+    padding-top: 10px; border-top: 1px dashed var(--line);
+  }
+  .card-controls b{ color: var(--text); }
+
+  .card-actions{ display:flex; gap:10px; margin-top: 6px; }
+  .btn{
+    flex:1; text-align:center; padding: 10px 14px; border-radius: 9px;
+    font-size: 13px; font-weight:600; font-family:'JetBrains Mono', monospace;
+    transition: filter .2s ease, opacity .2s ease;
+  }
+  .btn-play{ background: var(--accent); color: #0a0a12; }
+  .btn-play:hover{ filter: brightness(1.12); }
+  .btn-code{ border: 1px solid var(--line); color: var(--text-dim); }
+  .btn-code:hover{ border-color: var(--accent); color: var(--text); }
+
+  .card.disabled{ opacity: .55; }
+  .card.disabled:hover{ transform:none; box-shadow:none; border-color: var(--line); }
+  .ribbon{
+    position:absolute; top:14px; right:-34px; transform: rotate(40deg);
+    background: var(--gold); color:#1b1b1b; font-family:'JetBrains Mono', monospace;
+    font-size: 10px; font-weight:700; padding: 4px 40px; letter-spacing:.05em;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    padding: 40px 0 60px; text-align:center;
+    color: var(--text-dim); font-size: 13px;
+    font-family:'JetBrains Mono', monospace;
+  }
+  footer a{ color: var(--cyan); }
+
+  @media (max-width: 720px){
+    .about-grid{ grid-template-columns: 1fr; gap: 14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .hero-eyebrow::before{ animation:none; }
+    .card{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-eyebrow">Game Development · UNIVALLE La Paz</div>
+    <h1>GAMEHAVEN</h1>
+    <p class="lead">Portafolio de prototipos de videojuegos de <strong style="color:var(--text)">Harold Abdel Carpio Santander</strong> — cada juego combina una mecánica jugable con un mensaje real: matemática, medioambiente, salud, ciudadanía y economía personal.</p>
+    <div class="hero-stats">
+      <div class="stat"><b>06</b><span>Prototipos</span></div>
+      <div class="stat"><b>06</b><span>Jugables</span></div>
+      <div class="stat"><b>4to</b><span>Semestre Ing. Sistemas</span></div>
+    </div>
+  </div>
+</header>
+
+<section class="about">
+  <div class="wrap about-grid">
+    <div class="about-label">// Sobre mí</div>
+    <div>
+      <h2>Harold Abdel Carpio Santander</h2>
+      <p>Estudiante de 4to semestre de <strong>Ingeniería en Sistemas</strong> en la <strong>Universidad Privada del Valle (UNIVALLE)</strong>, La Paz, Bolivia. Me interesa el desarrollo de software y cómo la lógica de programación se combina con el diseño de juegos para crear experiencias interactivas con propósito.</p>
+      <p>Este sitio reúne los primeros prototipos desarrollados en la asignatura <em>Introducción al Desarrollo de Videojuegos</em>.</p>
+      <div class="badges">
+        <span class="badge">Desarrollo de software</span>
+        <span class="badge">Game design</span>
+        <span class="badge">Narrativa interactiva</span>
+        <span class="badge">Lógica de programación</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="games">
+  <div class="wrap">
+    <h2>SELECCIONA TU JUEGO</h2>
+    <p class="sub">Seis prototipos, seis mecánicas distintas. Presiona jugar para probarlos directo en el navegador.</p>
+
+    <div class="grid">
+
+      <!-- mathAdventure -->
+      <article class="card" style="--accent:#00f5d4; --accent-glow: rgba(0,245,212,.28);">
+        <div class="card-media"><img src="01-mathadventure/assets/banner.svg" alt="mathAdventure" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-top"><span class="card-title">mathAdventure</span><span class="num">01</span></div>
+          <div class="chips"><span class="chip">Arcade / Runner</span><span class="chip">Educativo</span></div>
+          <p class="card-desc">Runner de velocidad creciente estilo Geometry Dash: cada obstáculo lanza una operación matemática que debes resolver al vuelo.</p>
+          <div class="card-controls"><b>Controles:</b> Click · Espacio</div>
+          <div class="card-actions">
+            <a class="btn btn-play" href="01-mathadventure/">▶ Jugar</a>
+            <a class="btn btn-code" href="https://github.com/haroldcarpio72-ai/GameHaven/tree/main/01-mathadventure" target="_blank" rel="noopener">Código</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- EcoCity -->
+      <article class="card" style="--accent:#8bc34a; --accent-glow: rgba(139,195,74,.28);">
+        <div class="card-media"><img src="02-ecocity/assets/banner.svg" alt="EcoCity" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-top"><span class="card-title">EcoCity</span><span class="num">02</span></div>
+          <div class="chips"><span class="chip">Puzzle / Arcade</span><span class="chip">Educativo</span></div>
+          <p class="card-desc">Un pequeño animal recolecta basura por la ciudad y debe depositarla en el contenedor correcto antes de perder toda su vida.</p>
+          <div class="card-controls"><b>Controles:</b> W A S D</div>
+          <div class="card-actions">
+            <a class="btn btn-play" href="02-ecocity/">▶ Jugar</a>
+            <a class="btn btn-code" href="https://github.com/haroldcarpio72-ai/GameHaven/tree/main/02-ecocity" target="_blank" rel="noopener">Código</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- HealthyStar -->
+      <article class="card" style="--accent:#ffd23f; --accent-glow: rgba(255,210,63,.28);">
+        <div class="card-media"><img src="03-healthystar/assets/banner.svg" alt="HealthyStar" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-top"><span class="card-title">HealthyStar</span><span class="num">03</span></div>
+          <div class="chips"><span class="chip">Puzzle / Survival</span><span class="chip">Educativo</span></div>
+          <p class="card-desc">Una estrella atrapada en un laberinto de visión limitada: comer saludable mejora su aspecto y amplía su visión; la chatarra la oscurece.</p>
+          <div class="card-controls"><b>Controles:</b> W A S D</div>
+          <div class="card-actions">
+            <a class="btn btn-play" href="03-healthystar/">▶ Jugar</a>
+            <a class="btn btn-code" href="https://github.com/haroldcarpio72-ai/GameHaven/tree/main/03-healthystar" target="_blank" rel="noopener">Código</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Héroe del Agua -->
+      <article class="card" style="--accent:#61dafb; --accent-glow: rgba(97,218,251,.28);">
+        <div class="card-media"><img src="04-heroe-del-agua/assets/banner.svg" alt="Héroe del Agua" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-top"><span class="card-title">Héroe del Agua</span><span class="num">04</span></div>
+          <div class="chips"><span class="chip">Arcade / Acción</span><span class="chip">Educativo</span></div>
+          <p class="card-desc">Recorre la ciudad cerrando grifos abiertos. Los power-ups "plus" atraen grifos cercanos, pero también atraen basura que resta vida.</p>
+          <div class="card-controls"><b>Controles:</b> W A S D</div>
+          <div class="card-actions">
+            <a class="btn btn-play" href="04-heroe-del-agua/">▶ Jugar</a>
+            <a class="btn btn-code" href="https://github.com/haroldcarpio72-ai/GameHaven/tree/main/04-heroe-del-agua" target="_blank" rel="noopener">Código</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Detrás de la Pantalla -->
+      <article class="card" style="--accent:#ff5252; --accent-glow: rgba(255,82,82,.25);">
+        <div class="card-media"><img src="05-detras-de-la-pantalla/assets/banner.svg" alt="Detrás de la Pantalla" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-top"><span class="card-title">Detrás de la Pantalla</span><span class="num">05</span></div>
+          <div class="chips"><span class="chip">Narrativo</span><span class="chip">Storytelling</span></div>
+          <p class="card-desc">Novela interactiva sobre ciberacoso contada desde dos perspectivas —acosado y acosador— donde cada decisión cambia el desenlace.</p>
+          <div class="card-controls"><b>Controles:</b> Click</div>
+          <div class="card-actions">
+            <a class="btn btn-play" href="05-detras-de-la-pantalla/">▶ Jugar</a>
+            <a class="btn btn-code" href="https://github.com/haroldcarpio72-ai/GameHaven/tree/main/05-detras-de-la-pantalla" target="_blank" rel="noopener">Código</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Llega a Fin de Mes -->
+      <article class="card" style="--accent:#8bc34a; --accent-glow: rgba(139,195,74,.28);">
+        <div class="card-media"><img src="06-llega-a-fin-de-mes/assets/banner.svg" alt="Llega a Fin de Mes" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-top"><span class="card-title">Llega a Fin de Mes</span><span class="num">06</span></div>
+          <div class="chips"><span class="chip">Simulación</span><span class="chip">Decisiones</span></div>
+          <p class="card-desc">Administra tu dinero y tu estado de ánimo frente a imprevistos y tentaciones a lo largo del mes.</p>
+          <div class="card-controls"><b>Controles:</b> Click</div>
+          <div class="card-actions">
+            <a class="btn btn-play" href="06-llega-a-fin-de-mes/">▶ Jugar</a>
+            <a class="btn btn-code" href="https://github.com/haroldcarpio72-ai/GameHaven/tree/main/06-llega-a-fin-de-mes" target="_blank" rel="noopener">Código</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Portafolio creado para la asignatura Game Development · <a href="https://github.com/haroldcarpio72-ai/GameHaven" target="_blank" rel="noopener">Ver repositorio en GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bge" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a2e36"/>
+      <stop offset="100%" stop-color="#0f3d2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#bge)"/>
+
+  <!-- Skyline ciudad -->
+  <g fill="#123f38">
+    <rect x="0" y="230" width="90" height="170"/>
+    <rect x="100" y="180" width="70" height="220"/>
+    <rect x="180" y="250" width="100" height="150"/>
+    <rect x="950" y="200" width="80" height="200"/>
+    <rect x="1040" y="250" width="70" height="150"/>
+    <rect x="1120" y="170" width="80" height="230"/>
+  </g>
+  <g fill="#1c5c4f">
+    <rect x="10" y="250" width="15" height="20"/>
+    <rect x="40" y="250" width="15" height="20"/>
+    <rect x="10" y="290" width="15" height="20"/>
+    <rect x="120" y="210" width="15" height="20"/>
+    <rect x="150" y="210" width="15" height="20"/>
+  </g>
+
+  <!-- Sol -->
+  <circle cx="600" cy="90" r="40" fill="#ffd23f" opacity="0.85"/>
+
+  <!-- Personaje animalito -->
+  <g transform="translate(430,270)">
+    <ellipse cx="40" cy="70" rx="42" ry="30" fill="#8bc34a"/>
+    <circle cx="65" cy="40" r="26" fill="#a5d76e"/>
+    <circle cx="75" cy="32" r="4" fill="#1b1b1b"/>
+    <polygon points="60,20 65,5 72,22" fill="#a5d76e"/>
+    <polygon points="80,18 88,4 90,22" fill="#a5d76e"/>
+  </g>
+
+  <!-- Basura y contenedor de reciclaje -->
+  <g transform="translate(700,290)">
+    <rect x="0" y="10" width="46" height="55" rx="4" fill="#2e7d32"/>
+    <rect x="0" y="0" width="46" height="12" rx="3" fill="#4caf50"/>
+    <text x="23" y="45" font-family="Verdana" font-size="20" fill="#ffffff" text-anchor="middle">♻</text>
+  </g>
+  <g fill="#5d4037" opacity="0.9">
+    <path d="M300 340 l10 -20 l8 5 l-6 18 z"/>
+    <circle cx="330" cy="335" r="8"/>
+  </g>
+
+  <!-- Titulo -->
+  <text x="600" y="200" font-family="Segoe UI, Verdana, sans-serif" font-size="64" font-weight="800" fill="#ffffff" text-anchor="middle">EcoCity</text>
+  <text x="600" y="240" font-family="Segoe UI, Verdana, sans-serif" font-size="20" fill="#c8e6c9" text-anchor="middle">Recicla y cuida la ciudad · Clasificación de residuos</text>
+</svg>

@@ -1,0 +1,37 @@
+<svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgh" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a0933"/>
+      <stop offset="100%" stop-color="#3a0d5c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffd23f" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ffd23f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#bgh)"/>
+
+  <!-- Laberinto (baja visibilidad) -->
+  <g stroke="#5a3d8a" stroke-width="6" fill="none" opacity="0.5">
+    <path d="M50 50 H250 V150 H150 V250 H300"/>
+    <path d="M900 60 H1150 V180 H1000 V300 H1150"/>
+    <path d="M100 320 H300 V380"/>
+  </g>
+
+  <!-- Halo alrededor de la estrella (vision limitada) -->
+  <circle cx="600" cy="210" r="150" fill="url(#glow)"/>
+
+  <!-- Estrella jugador -->
+  <polygon points="600,150 617,195 665,195 626,222 641,268 600,240 559,268 574,222 535,195 583,195"
+           fill="#ffd23f" stroke="#ffffff" stroke-width="2"/>
+
+  <!-- Comida saludable vs chatarra -->
+  <circle cx="440" cy="230" r="16" fill="#8bc34a"/>
+  <text x="440" y="236" font-family="Verdana" font-size="16" text-anchor="middle">🍎</text>
+  <circle cx="770" cy="230" r="16" fill="#ff5252"/>
+  <text x="770" y="236" font-family="Verdana" font-size="16" text-anchor="middle">🍔</text>
+
+  <!-- Titulo -->
+  <text x="600" y="340" font-family="Segoe UI, Verdana, sans-serif" font-size="60" font-weight="800" fill="#ffffff" text-anchor="middle">HealthyStar</text>
+  <text x="600" y="375" font-family="Segoe UI, Verdana, sans-serif" font-size="18" fill="#d8c6f0" text-anchor="middle">Laberinto de decisiones alimenticias · Contra el tiempo</text>
+</svg>
